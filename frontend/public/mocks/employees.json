@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "first_name": "John",
+    "last_name": "Doe",
+    "position": "Software Engineer",
+    "department": "Engineering",
+    "hire_date": "2022-03-01",
+    "salary": 70000
+  },
+  {
+    "id": 2,
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "position": "Product Manager",
+    "department": "Product",
+    "hire_date": "2021-08-15",
+    "salary": 85000
+  }
+]

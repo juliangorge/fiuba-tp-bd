@@ -1,0 +1,16 @@
+[
+  {
+    "employee_id": 1,
+    "activities": [
+      { "activity_id": "a1", "description": "Completed project report", "date": "2023-11-15" },
+      { "activity_id": "a2", "description": "Team meeting", "date": "2023-11-14" }
+    ]
+  },
+  {
+    "employee_id": 2,
+    "activities": [
+      { "activity_id": "b1", "description": "Prepared product demo", "date": "2023-11-12" },
+      { "activity_id": "b2", "description": "Client call", "date": "2023-11-10" }
+    ]
+  }
+]
