@@ -1,4 +1,5 @@
--- Check if the table is empty before inserting mock data
+-- +goose Up
+-- +goose StatementBegin
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM employees) THEN
@@ -9,3 +10,4 @@ BEGIN
         ('Bob', 'Brown', 'Data Scientist', 'Data', '2019-11-05', 90000);
     END IF;
 END $$;
+-- +goose StatementEnd

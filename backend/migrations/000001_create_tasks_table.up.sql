@@ -1,3 +1,5 @@
+-- +goose Up
+-- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS employees (
     id SERIAL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
@@ -7,3 +9,4 @@ CREATE TABLE IF NOT EXISTS employees (
     hire_date DATE NOT NULL,
     salary INT NOT NULL
 );
+-- +goose StatementEnd

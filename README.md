@@ -5,9 +5,12 @@ Frontend - NextJS (React)
 Backend - GO
 
 Integrantes:
-Julián Gorge - 104286
+- Julián Gorge - 104286
+- Martin Pata Fraile de Manterola - 106226
 
 # Instructions
+
+`docker-compose up --build`
 
 Run the following commands inside of /frontend:
 docker build -t nextjs-app .
