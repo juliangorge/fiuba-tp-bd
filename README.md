@@ -1,14 +1,17 @@
 # fiuba-tp-bd
 
-Stack:
+### Stack:
+
 Frontend - NextJS (React)
+
 Backend - GO
 
-Integrantes:
+### Integrantes:
 - Julián Gorge - 104286
 - Martin Pata Fraile de Manterola - 106226
+- Joaquín Velurtas - 109655
 
-# Instructions
+## Instructions
 
 `docker-compose up --build`
 
