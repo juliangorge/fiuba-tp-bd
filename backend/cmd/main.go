@@ -1,14 +1,20 @@
 package main
 
 import (
+	"bdd-back/employees"
 	"context"
+	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	_ "github.com/lib/pq"
+	"github.com/pressly/goose"
 )
 
 func ping(w http.ResponseWriter, r *http.Request) {
@@ -16,9 +22,29 @@ func ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	router := http.NewServeMux()
+	dbPassword := os.Getenv("POSTGRES_PASSWORD")
+	dbUser := os.Getenv("POSTGRES_USER")
+	dbName := os.Getenv("POSTGRES_DB")
+	dbHost := os.Getenv("POSTGRES_HOST")
 
+	db, err := sql.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s:5432/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbName))
+	if err != nil {
+		log.Fatalf("Error opening database: %v", err)
+	}
+
+	// Run migrations
+	if err := goose.Up(db, "migrations"); err != nil {
+		log.Fatalf("Error running migrations: %v", err)
+	}
+
+	employeesRepo := employees.NewEmployeeSQLStorage(db)
+
+	router := http.NewServeMux()
 	router.HandleFunc("/ping", ping)
+
+	employeeController := employees.NewEmployeeController(employeesRepo)
+
+	router.HandleFunc("/employees", employeeController.GetAll)
 
 	server := &http.Server{
 		Addr:    ":8080",
