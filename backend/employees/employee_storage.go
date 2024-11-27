@@ -1,6 +1,11 @@
 package employees
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+)
+
+var ErrEmployeeNotFound = errors.New("employee not found")
 
 type EmployeeSQLStorage struct {
 	DB *sql.DB
@@ -36,6 +41,9 @@ func (s *EmployeeSQLStorage) GetByID(id int) (*Employee, error) {
 	var e Employee
 	err := row.Scan(&e.ID, &e.FirstName, &e.LastName, &e.Position, &e.Department, &e.HireDate, &e.Salary)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, ErrEmployeeNotFound
+		}
 		return nil, err
 	}
 

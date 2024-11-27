@@ -53,7 +53,11 @@ func (c *EmployeeController) GetByID(w http.ResponseWriter, r *http.Request) {
 	employee, err := c.storage.GetByID(id)
 	if err != nil {
 		log.Printf("ERROR: Failed to Get Employee by ID: %v", err)
-		utils.HandleHttpError(ctx, w, "Failed to Get Employee by ID", http.StatusInternalServerError, err)
+		if err == ErrEmployeeNotFound {
+			utils.HandleHttpError(ctx, w, "Employee not found", http.StatusNotFound, err)
+		} else {
+			utils.HandleHttpError(ctx, w, "Failed to Get Employee by ID", http.StatusInternalServerError, err)
+		}
 		return
 	}
 
@@ -103,6 +107,12 @@ func (c *EmployeeController) Update(w http.ResponseWriter, r *http.Request) {
 	err = employee.Validate()
 	if err != nil {
 		utils.HandleHttpError(ctx, w, "Invalid Employee", http.StatusBadRequest, err)
+		return
+	}
+
+	_, err = c.storage.GetByID(id)
+	if err != nil {
+		utils.HandleHttpError(ctx, w, "Employee not found", http.StatusNotFound, err)
 		return
 	}
 
