@@ -45,6 +45,10 @@ func main() {
 	employeeController := employees.NewEmployeeController(employeesRepo)
 
 	router.HandleFunc("/employees", employeeController.GetAll)
+	router.HandleFunc("/employees/{id}", employeeController.GetByID)
+	router.HandleFunc("POST /employees", employeeController.Create)
+	router.HandleFunc("PUT /employees/{id}", employeeController.Update)
+	router.HandleFunc("DELETE /employees/{id}", employeeController.Delete)
 
 	server := &http.Server{
 		Addr:    ":8080",
