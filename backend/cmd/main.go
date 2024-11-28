@@ -12,6 +12,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/mongodb"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose"
 	"go.mongodb.org/mongo-driver/bson"
@@ -29,6 +32,7 @@ func ping(w http.ResponseWriter, r *http.Request) {
 func main() {
 	employeesRepo := setupPostgresConnection()
 
+	runMongoDBMigrations()
 	collection, client, mongoDBContext, cancel := setupMongoDBConnection()
 	defer closeMongoDBConnection(client, mongoDBContext, cancel)
 
@@ -98,14 +102,11 @@ func setupPostgresConnection() *employees.EmployeeSQLStorage {
 }
 
 func setupMongoDBConnection() (*mongo.Collection, *mongo.Client, context.Context, context.CancelFunc) {
-	mongoDBHost := os.Getenv("MONGODB_HOST")
-	mongoDBUser := os.Getenv("MONGODB_USER")
-	mongoDBPassword := os.Getenv("MONGODB_PASSWORD")
 	mongoDBDatabase := "local"
 	mongoDBCollection := "startup_log"
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+mongoDBUser+":"+mongoDBPassword+"@"+mongoDBHost+":27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(buildMongoDBUriWithAuth()))
 	if err != nil {
 		panic(fmt.Sprintf("Mongo DB Connect issue %s", err))
 	}
@@ -125,4 +126,31 @@ func closeMongoDBConnection(client *mongo.Client, context context.Context, cance
 		}
 		fmt.Println("Close connection is called")
 	}()
+}
+
+// Valid operations can be gotten from https://github.com/golang-migrate/migrate/tree/master/database/mongodb/examples/migrations
+func runMongoDBMigrations() {
+	// Replace with your MongoDB connection string and migrations folder path
+	m, err := migrate.New(
+		"file://mongodbmigrations",
+		buildMongoDBUriWithAuth()+"/admin",
+	)
+	if err != nil {
+		log.Fatalf("Failed to create migrate instance: %v", err)
+	}
+
+	// Apply migrations
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatalf("Failed to apply migrations: %v", err)
+	}
+
+	log.Println("Migrations applied successfully!")
+}
+
+func buildMongoDBUriWithAuth() string {
+	mongoDBHost := os.Getenv("MONGODB_HOST")
+	mongoDBUser := os.Getenv("MONGODB_USER")
+	mongoDBPassword := os.Getenv("MONGODB_PASSWORD")
+
+	return "mongodb://" + mongoDBUser + ":" + mongoDBPassword + "@" + mongoDBHost + ":27017"
 }
