@@ -10,6 +10,7 @@ Backend - GO
 - Julián Gorge - 104286
 - Martin Pata Fraile de Manterola - 106226
 - Joaquín Velurtas - 109655
+- Rodrigo souto - 97649
 
 ## Instructions
 
