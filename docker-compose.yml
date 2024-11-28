@@ -31,8 +31,16 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: toor
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh mongodb://root:toor@localhost:27017 --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - fullstack
 
   backend:
     container_name: api_dockerizing
@@ -46,11 +54,16 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
       POSTGRES_HOST: postgres
+      MONGODB_HOST: mongodb
+      MONGODB_USER: root
+      MONGODB_PASSWORD: toor
     restart: always
     volumes:
       - api_volume:/usr/src/app/
     depends_on:
       postgres:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
     networks:
       - fullstack
