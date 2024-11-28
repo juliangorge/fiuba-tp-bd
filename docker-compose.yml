@@ -23,6 +23,17 @@ services:
       timeout: 5s
       retries: 5
 
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: toor
+    volumes:
+      - mongodb_data:/data/db
+
   backend:
     container_name: api_dockerizing
     build:
@@ -58,6 +69,7 @@ services:
 volumes:
   database_dockerizing:
   api_volume:
+  mongodb_data:
 
 networks:
   fullstack:
