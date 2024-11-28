@@ -29,6 +29,23 @@ func ping(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("pong"))
 }
 
+func CorsMiddleware(next http.Handler) http.Handler {
+	// Allow CORS here by * or specific origin
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+		// Handle preflight requests
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	employeesRepo := setupPostgresConnection()
 
@@ -45,6 +62,7 @@ func main() {
 	fmt.Printf("Found document: %v\n", result)
 
 	router := http.NewServeMux()
+
 	router.HandleFunc("/ping", ping)
 
 	employeeController := employees.NewEmployeeController(employeesRepo)
@@ -55,9 +73,12 @@ func main() {
 	router.HandleFunc("PUT /employees/{id}", employeeController.Update)
 	router.HandleFunc("DELETE /employees/{id}", employeeController.Delete)
 
+	// Wrap the router with the CORS middleware
+	corsRouter := CorsMiddleware(router)
+
 	server := &http.Server{
 		Addr:    ":8080",
-		Handler: router,
+		Handler: corsRouter,
 	}
 
 	go func() {

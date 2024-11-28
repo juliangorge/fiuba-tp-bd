@@ -22,7 +22,7 @@ export default function EmployeesTable() {
 
   useEffect(() => {
     const fetchMockData = async () => {
-      const response = await fetch('/mocks/employees.json');
+      const response = await fetch('http://localhost:8080/employees');
       const data: Employee[] = await response.json();
       setEmployees(data);
     };

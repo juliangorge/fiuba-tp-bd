@@ -3,6 +3,7 @@ module bdd-back
 go 1.23.3
 
 require (
+	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/lib/pq v1.10.9
 	github.com/pressly/goose v2.7.0+incompatible
 	go.mongodb.org/mongo-driver v1.17.1
@@ -10,7 +11,6 @@ require (
 
 require (
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
-	github.com/golang-migrate/migrate/v4 v4.18.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
