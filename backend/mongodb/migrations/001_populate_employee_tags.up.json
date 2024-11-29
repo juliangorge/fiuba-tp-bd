@@ -3,10 +3,35 @@
     "insert": "employee_tags",
     "documents": [
       {
-        "name": "John Doe",
-        "email": "johndoe@example.com",
-        "created_at": "2024-11-28T00:00:00Z",
-        "status": "active"
+        "employee_id": 1,
+        "tags": ["remote", "backend"]
+      }
+    ]
+  },
+  {
+    "insert": "employee_tags",
+    "documents": [
+      {
+        "employee_id": 2,
+        "tags": ["frontend"]
+      }
+    ]
+  },
+  {
+    "insert": "employee_tags",
+    "documents": [
+      {
+        "employee_id": 3,
+        "tags": ["frontend", "remote"]
+      }
+    ]
+  },
+  {
+    "insert": "employee_tags",
+    "documents": [
+      {
+        "employee_id": 4,
+        "tags": ["backend"]
       }
     ]
   }
