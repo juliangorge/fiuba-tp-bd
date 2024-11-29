@@ -1,0 +1,38 @@
+[
+  {
+    "insert": "employee_tags",
+    "documents": [
+      {
+        "employee_id": 1,
+        "tags": ["remote", "backend"]
+      }
+    ]
+  },
+  {
+    "insert": "employee_tags",
+    "documents": [
+      {
+        "employee_id": 2,
+        "tags": ["frontend"]
+      }
+    ]
+  },
+  {
+    "insert": "employee_tags",
+    "documents": [
+      {
+        "employee_id": 3,
+        "tags": ["frontend", "remote"]
+      }
+    ]
+  },
+  {
+    "insert": "employee_tags",
+    "documents": [
+      {
+        "employee_id": 4,
+        "tags": ["backend"]
+      }
+    ]
+  }
+]

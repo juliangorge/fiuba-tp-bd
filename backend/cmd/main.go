@@ -17,11 +17,11 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
+	employeetags "bdd-back/employee_tags"
 	"bdd-back/employees"
 )
 
@@ -50,28 +50,25 @@ func main() {
 	employeesRepo := setupPostgresConnection()
 
 	runMongoDBMigrations()
-	collection, client, mongoDBContext, cancel := setupMongoDBConnection()
+	employeeTagStorage, client, mongoDBContext, cancel := setupMongoDBConnection()
 	defer closeMongoDBConnection(client, mongoDBContext, cancel)
-
-	// This chunk is only for the initial MongoDB setup
-	var result bson.M
-	err := collection.FindOne(mongoDBContext, bson.D{}).Decode(&result)
-	if err != nil {
-		log.Fatalf("Failed to find document: %v", err)
-	}
-	fmt.Printf("Found document: %v\n", result)
 
 	router := http.NewServeMux()
 
 	router.HandleFunc("/ping", ping)
 
 	employeeController := employees.NewEmployeeController(employeesRepo)
+	employeeTagController := employeetags.NewEmployeeTagController(employeeTagStorage)
 
 	router.HandleFunc("/employees", employeeController.GetAll)
 	router.HandleFunc("/employees/{id}", employeeController.GetByID)
 	router.HandleFunc("POST /employees", employeeController.Create)
 	router.HandleFunc("PUT /employees/{id}", employeeController.Update)
 	router.HandleFunc("DELETE /employees/{id}", employeeController.Delete)
+
+	router.HandleFunc("/employee_tags/{employee_id}", employeeTagController.GetAllTagsByID)
+	router.HandleFunc("POST /employee_tags/{employee_id}/tags/{tag_name}", employeeTagController.InsertTag)
+	router.HandleFunc("DELETE /employee_tags/{employee_id}/tags/{tag_name}", employeeTagController.RemoveTag)
 
 	// Wrap the router with the CORS middleware
 	corsRouter := CorsMiddleware(router)
@@ -122,9 +119,9 @@ func setupPostgresConnection() *employees.EmployeeSQLStorage {
 	return employeesRepo
 }
 
-func setupMongoDBConnection() (*mongo.Collection, *mongo.Client, context.Context, context.CancelFunc) {
-	mongoDBDatabase := "local"
-	mongoDBCollection := "startup_log"
+func setupMongoDBConnection() (employeetags.EmployeeTagStorage, *mongo.Client, context.Context, context.CancelFunc) {
+	mongoDBDatabase := "admin"
+	mongoDBCollection := "employee_tags"
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(buildMongoDBUriWithAuth()))
@@ -135,8 +132,11 @@ func setupMongoDBConnection() (*mongo.Collection, *mongo.Client, context.Context
 	if err != nil {
 		panic(fmt.Sprintf("Mongo DB ping issue %s", err))
 	}
+
 	collection := client.Database(mongoDBDatabase).Collection(mongoDBCollection)
-	return collection, client, ctx, cancel
+	employeeTagsRepo := employeetags.NewEmployeeTagMongoDBStorage(collection)
+
+	return employeeTagsRepo, client, ctx, cancel
 }
 
 func closeMongoDBConnection(client *mongo.Client, context context.Context, cancel context.CancelFunc) {
@@ -153,7 +153,7 @@ func closeMongoDBConnection(client *mongo.Client, context context.Context, cance
 func runMongoDBMigrations() {
 	// Replace with your MongoDB connection string and migrations folder path
 	m, err := migrate.New(
-		"file://mongodbmigrations",
+		"file://mongodb/migrations",
 		buildMongoDBUriWithAuth()+"/admin",
 	)
 	if err != nil {
