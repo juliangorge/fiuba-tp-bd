@@ -1,0 +1,14 @@
+[
+  {
+    "createIndexes": "employee_tags",
+    "indexes": [
+      {
+        "key": {
+          "employee_id": 1
+        },
+        "name": "index_employee_id",
+        "unique": true
+      }
+    ]
+  }
+]
