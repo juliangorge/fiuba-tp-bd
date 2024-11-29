@@ -132,7 +132,7 @@ func closeMongoDBConnection(client *mongo.Client, context context.Context, cance
 func runMongoDBMigrations() {
 	// Replace with your MongoDB connection string and migrations folder path
 	m, err := migrate.New(
-		"file://mongodbmigrations",
+		"file://mongodb/migrations",
 		buildMongoDBUriWithAuth()+"/admin",
 	)
 	if err != nil {
