@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,6 +19,22 @@ interface ViewEmployeeModalProps {
 export default function ViewEmployeeModal({
   employee,
 }: ViewEmployeeModalProps) {
+  const [tags, setTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (employee) {
+      fetch(`/api/employee_tags/${employee.id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.tags) {
+            setTags(data.tags);
+          } else {
+            setTags([]);
+          }
+        })
+    }
+  }, [employee]);
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -47,8 +64,20 @@ export default function ViewEmployeeModal({
               </Label>
               {employee.department}
             </div>
-
-            <p>And here we should show no-sql data</p>
+            <div>
+              <h3 className="font-bold">Tags</h3>
+              {tags.length > 0 ? (
+                <ul>
+                  {tags.map((tag, index) => (
+                    <li key={index} className="tag-item">
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No tags available</p>
+              )}
+            </div>
           </div>
         )}
       </DialogContent>
