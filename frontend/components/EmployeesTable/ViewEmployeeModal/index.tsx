@@ -23,7 +23,7 @@ export default function ViewEmployeeModal({
 
   useEffect(() => {
     if (employee) {
-      fetch(`/api/employee_tags/${employee.id}`)
+      fetch(`http://localhost:8080/api/employee_tags/${employee.id}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.tags) {
@@ -31,7 +31,7 @@ export default function ViewEmployeeModal({
           } else {
             setTags([]);
           }
-        })
+        });
     }
   }, [employee]);
 
