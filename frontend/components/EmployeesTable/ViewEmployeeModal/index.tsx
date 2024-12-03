@@ -31,9 +31,39 @@ export default function ViewEmployeeModal({
           } else {
             setTags([]);
           }
-        });
+        })
+        .catch((err) => console.error('Failed to fetch tags:', err));
     }
   }, [employee]);
+
+  const addTag = (newTag: string) => {
+    if (!newTag.trim()) return;
+    fetch(`http://localhost:8080/api/employee_tags/${employee?.id}/tags/${newTag}`, {
+      method: 'POST',
+    })
+      .then((res) => {
+        if (res.ok) {
+          setTags((prev) => [...prev, newTag]);
+        } else {
+          console.error('Failed to add tag');
+        }
+      })
+      .catch(console.error);
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    fetch(`http://localhost:8080/api/employee_tags/${employee?.id}/tags/${tagToRemove}`, {
+      method: 'DELETE',
+    })
+      .then((res) => {
+        if (res.ok) {
+          setTags((prev) => prev.filter((tag) => tag !== tagToRemove));
+        } else {
+          console.error('Failed to remove tag');
+        }
+      })
+      .catch(console.error);
+  };
 
   return (
     <Dialog>
@@ -69,14 +99,41 @@ export default function ViewEmployeeModal({
               {tags.length > 0 ? (
                 <ul>
                   {tags.map((tag, index) => (
-                    <li key={index} className="tag-item">
+                    <li key={index} className="tag-item flex items-center gap-2">
                       {tag}
+                      <button
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => removeTag(tag)}
+                      >
+                        x
+                      </button>
                     </li>
                   ))}
                 </ul>
               ) : (
                 <p>No tags available</p>
               )}
+            </div>
+            <div className="mt-4">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const form = e.target as HTMLFormElement;
+                  const input = form.elements.namedItem('new-tag') as HTMLInputElement;
+                  addTag(input.value);
+                  input.value = '';
+                }}
+              >
+                <input
+                  type="text"
+                  name="new-tag"
+                  className="border p-2 rounded mr-2"
+                  placeholder="Enter tag name"
+                />
+                <button type="submit" className="text-white bg-blue-500 px-4 py-2 rounded hover:bg-blue-700 text-xl">
+                  +
+                </button>
+              </form>
             </div>
           </div>
         )}
