@@ -23,7 +23,7 @@ export default function ViewEmployeeModal({
 
   useEffect(() => {
     if (employee) {
-      fetch(`http://localhost:8080/api/employee_tags/${employee.id}`)
+      fetch(`http://localhost:8080/employee_tags/${employee.id}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.tags) {
@@ -38,7 +38,7 @@ export default function ViewEmployeeModal({
 
   const addTag = (newTag: string) => {
     if (!newTag.trim()) return;
-    fetch(`http://localhost:8080/api/employee_tags/${employee?.id}/tags/${newTag}`, {
+    fetch(`http://localhost:8080/employee_tags/${employee?.id}/tags/${newTag}`, {
       method: 'POST',
     })
       .then((res) => {
@@ -52,7 +52,7 @@ export default function ViewEmployeeModal({
   };
 
   const removeTag = (tagToRemove: string) => {
-    fetch(`http://localhost:8080/api/employee_tags/${employee?.id}/tags/${tagToRemove}`, {
+    fetch(`http://localhost:8080/employee_tags/${employee?.id}/tags/${tagToRemove}`, {
       method: 'DELETE',
     })
       .then((res) => {
