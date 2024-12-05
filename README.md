@@ -14,10 +14,27 @@ Backend - GO
 
 ## Instructions
 
-`docker-compose up --build`
+1. Go to the root directory of the repo.
 
-Run the following commands inside of /frontend:
-docker build -t nextjs-app .
-docker run -p 3000:3000 nextjs-app
+2. Stop all running containers (to prevent conflicts)
+```
+docker-compose stop
+```
 
-Now you can access to http://localhost:3000
+3. Setup the `.env` file, here is a dummy working example:
+```
+POSTGRES_PASSWORD=postgres123
+POSTGRES_USER=postgres
+POSTGRES_DB=postgres
+POSTGRES_HOST=postgres
+MONGO_INITDB_ROOT_USERNAME=root
+MONGO_INITDB_ROOT_PASSWORD=toor
+MONGODB_HOST=mongodb
+```
+
+4. Build and launch the services and databases.
+```
+docker-compose up --build`
+```
+
+5. Now you can access the website with to http://localhost:3000
